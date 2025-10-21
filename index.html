@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpiderAI - AI-Powered Skin Health Companion</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Lucide React icon components (simplified)
+        const Sparkles = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+        );
+
+        const Users = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+        );
+
+        const AlertCircle = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const Target = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+        );
+
+        const Lightbulb = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+        );
+
+        const Megaphone = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+            </svg>
+        );
+
+        const DollarSign = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const Calculator = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+        );
+
+        const Heart = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+        );
+
+        const Star = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+        );
+
+        const ChevronLeft = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+        );
+
+        const ChevronRight = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+        );
+
+        const EpiderAIPresentation = () => {
+            const [currentSlide, setCurrentSlide] = useState(0);
+
+            const slides = [
+                // Title Slide
+                {
+                    title: "EpiderAI",
+                    subtitle: "Your AI-Powered Skin Health Companion",
+                    tagline: "From skin problem to prescribed care, delivered to your door",
+                    icon: Sparkles,
+                    gradient: "from-purple-600 via-pink-500 to-rose-500"
+                },
+                // Slide 1: Customer Segment
+                {
+                    title: "Customer Segments",
+                    icon: Users,
+                    gradient: "from-blue-600 to-cyan-500",
+                    content: {
+                        b2b: {
+                            title: "B2B Partners",
+                            items: ["Beauty Parlours", "Doctor's Chambers", "Dermatology Clinics"]
+                        },
+                        b2c: {
+                            title: "B2C Target Audience",
+                            demographic: "Primarily women aged 16-30",
+                            characteristics: [
+                                "Deeply care about skin health",
+                                "Seek premium imported products",
+                                "Care for family members' skin needs",
+                                "Willing and able to invest in quality skincare"
+                            ]
+                        }
+                    }
+                },
+                // Slide 2: Problem
+                {
+                    title: "The Problem We Solve",
+                    icon: AlertCircle,
+                    gradient: "from-red-500 to-orange-500",
+                    problems: [
+                        {
+                            issue: "Diagnostic Uncertainty",
+                            detail: "Inability to distinguish between minor and major skin conditions"
+                        },
+                        {
+                            issue: "Healthcare Hassle",
+                            detail: "Multiple doctor visits even for minor issues, wasting time and effort"
+                        },
+                        {
+                            issue: "Financial Burden",
+                            detail: "High consultation costs and unnecessary treatment expenses"
+                        }
+                    ]
+                },
+                // Slide 3: Value Proposition
+                {
+                    title: "Unique Value Proposition",
+                    icon: Target,
+                    gradient: "from-emerald-600 to-teal-500",
+                    content: {
+                        main: "From skin problem to prescribed care, delivered to your door",
+                        concept: "Digital version of Bio-xin",
+                        benefits: [
+                            "Instant AI-powered skin analysis",
+                            "Expert dermatologist consultation",
+                            "Prescribed products delivered home"
+                        ]
+                    }
+                },
+                // Slide 4: Solution
+                {
+                    title: "Our Solution",
+                    icon: Lightbulb,
+                    gradient: "from-yellow-500 to-amber-500",
+                    solutions: [
+                        {
+                            step: "Scan & Identify",
+                            detail: "Advanced AI analyzes your skin and identifies issues instantly"
+                        },
+                        {
+                            step: "Smart Recommendations",
+                            detail: "AI suggests the perfect specialist for your specific condition"
+                        },
+                        {
+                            step: "Affordable Care",
+                            detail: "Low-cost consultations and treatment plans"
+                        }
+                    ]
+                },
+                // Slide 5: Marketing Strategy
+                {
+                    title: "Go-to-Market Strategy",
+                    icon: Megaphone,
+                    gradient: "from-indigo-600 to-purple-500",
+                    channels: [
+                        {
+                            type: "Strategic Partnerships",
+                            details: "Collaborate with premium clinics: Bio-xin, Laser Treat, Skinic Dermatology Center, Signature Aesthetic & Wellness Centre, Aesthetica Skin Care & Laser Centre"
+                        },
+                        {
+                            type: "Campus Marketing",
+                            details: "Targeted campaigns at universities, colleges, and youth events"
+                        },
+                        {
+                            type: "Digital Advertising",
+                            details: "Comprehensive online advertising across social media and search platforms"
+                        }
+                    ]
+                },
+                // Slide 6: Revenue Model
+                {
+                    title: "Revenue Model",
+                    icon: DollarSign,
+                    gradient: "from-green-600 to-emerald-500",
+                    streams: [
+                        {
+                            source: "B2B Revenue",
+                            model: "Monthly subscription fees from partner clinics and parlours"
+                        },
+                        {
+                            source: "B2C Revenue",
+                            model: "Per-scan charges and consultation fees from individual users"
+                        },
+                        {
+                            source: "Product Sales",
+                            model: "Commission from prescribed and recommended skincare products"
+                        }
+                    ]
+                },
+                // Slide 7: Financial Projections
+                {
+                    title: "12-Month Budget",
+                    icon: Calculator,
+                    gradient: "from-slate-700 to-gray-600",
+                    budget: [
+                        { category: "UI/UX Design (Web, Android, iOS)", amount: "150000" },
+                        { category: "Website Development", amount: "100000" },
+                        { category: "Android App Development", amount: "120000" },
+                        { category: "iOS App Development", amount: "150000" },
+                        { category: "AI Training & Development", amount: "300000" },
+                        { category: "Office Space (12 months)", amount: "360000" },
+                        { category: "Utilities", amount: "120000" },
+                        { category: "Marketing (12 months)", amount: "4800000" },
+                        { category: "Employee Salaries (6 members)", amount: "3600000" },
+                        { category: "Registration & Setup", amount: "80000" },
+                        { category: "Miscellaneous", amount: "600000" }
+                    ],
+                    total: "10380000"
+                },
+                // Slide 8: Vision & Impact
+                {
+                    title: "Our Vision",
+                    icon: Heart,
+                    gradient: "from-pink-600 to-rose-500",
+                    content: {
+                        problem: "Many people use clinically unproven products in pursuit of fair and clear skin, leading to serious skin diseases and complications",
+                        solution: "We provide scientifically-backed, personalized solutions for:",
+                        benefits: [
+                            "Fresh & Smooth Skin",
+                            "Brightened Complexion",
+                            "Healthier Skin Barrier",
+                            "Clear, Problem-Free Skin"
+                        ]
+                    }
+                },
+                // Slide 9: Unique Features
+                {
+                    title: "What Sets Us Apart",
+                    icon: Star,
+                    gradient: "from-violet-600 to-purple-500",
+                    features: [
+                        {
+                            name: "Advanced AI Progress Tracker",
+                            detail: "Sophisticated core AI model with 2-3 week trend analysis showing real results over time"
+                        },
+                        {
+                            name: "Unique Skin ID",
+                            detail: "Individual skin fingerprint technology for personalized tracking and analysis"
+                        },
+                        {
+                            name: "Custom Formulations",
+                            detail: "Personalized skincare products with proprietary formulas tailored to your unique skin profile"
+                        }
+                    ]
+                }
+            ];
+
+            const nextSlide = () => {
+                setCurrentSlide((prev) => (prev + 1) % slides.length);
+            };
+
+            const prevSlide = () => {
+                setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+            };
+
+            const CurrentSlide = slides[currentSlide];
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+                    <div className="w-full max-w-6xl">
+                        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                            {currentSlide === 0 ? (
+                                // Title Slide
+                                <div className={`relative h-[600px] bg-gradient-to-br ${CurrentSlide.gradient} flex flex-col items-center justify-center text-white p-12`}>
+                                    <CurrentSlide.icon className="w-24 h-24 mb-8 animate-pulse" />
+                                    <h1 className="text-7xl font-bold mb-4 text-center">{CurrentSlide.title}</h1>
+                                    <p className="text-3xl mb-4 text-center opacity-90">{CurrentSlide.subtitle}</p>
+                                    <div className="mt-8 px-8 py-4 bg-white/20 backdrop-blur-sm rounded-full">
+                                        <p className="text-xl italic text-center">{CurrentSlide.tagline}</p>
+                                    </div>
+                                </div>
+                            ) : currentSlide === 1 ? (
+                                // Customer Segments
+                                <div className="h-[600px] p-12 overflow-y-auto">
+                                    <div className={`flex items-center mb-8 bg-gradient-to-r ${CurrentSlide.gradient} text-white p-6 rounded-2xl`}>
+                                        <CurrentSlide.icon className="w-12 h-12 mr-4" />
+                                        <h2 className="text-4xl font-bold">{CurrentSlide.title}</h2>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-8">
+                                        <div className="bg-blue-50 p-6 rounded-xl">
+                                            <h3 className="text-2xl font-bold text-blue-900 mb-4">{CurrentSlide.content.b2b.title}</h3>
+                                            <ul className="space-y-2">
+                                                {CurrentSlide.content.b2b.items.map((item, idx) => (
+                                                    <li key={idx} className="flex items-center text-blue-800">
+                                                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                                                        {item}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        <div className="bg-pink-50 p-6 rounded-xl">
+                                            <h3 className="text-2xl font-bold text-pink-900 mb-4">{CurrentSlide.content.b2c.title}</h3>
+                                            <p className="text-pink-700 font-semibold mb-4">{CurrentSlide.content.b2c.demographic}</p>
+                                            <div className="space-y-3">
+                                                {CurrentSlide.content.b2c.characteristics.map((char, idx) => (
+                                                    <div key={idx} className="flex items-start">
+                                                        <div className="w-2 h-2 bg-pink-500 rounded-full mr-3 mt-2"></div>
+                                                        <p className="text-pink-800">{char}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : currentSlide === 2 ? (
+                                // Problems
+                                <div className="h-[600px] p-12 overflow-y-auto">
+                                    <div className={`flex items-center mb-8 bg-gradient-to-r ${CurrentSlide.gradient} text-white p-6 rounded-2xl`}>
+                                        <CurrentSlide.icon className="w-12 h-12 mr-4" />
+                                        <h2 className="text-4xl font-bold">{CurrentSlide.title}</h2>
+                                    </div>
+                                    <div className="space-y-6">
+                                        {CurrentSlide.problems.map((problem, idx) => (
+                                            <div key={idx} className="bg-red-50 p-6 rounded-xl border-l-4 border-red-500">
+                                                <h3 className="text-2xl font-bold text-red-900 mb-3">{problem.issue}</h3>
+                                                <p className="text-red-700 text-lg">{problem.detail}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : currentSlide === 3 ? (
+                                // Value Proposition
+                                <div className="h-[600px] p-12 overflow-y-auto">
+                                    <div className={`flex items-center mb-8 bg-gradient-to-r ${CurrentSlide.gradient} text-white p-6 rounded-2xl`}>
+                                        <CurrentSlide.icon className="w-12 h-12 mr-4" />
+                                        <h2 className="text-4xl font-bold">{CurrentSlide.title}</h2>
+                                    </div>
+                                    <div className="text-center mb-8">
+                                        <p className="text-3xl font-bold text-emerald-900 mb-4">"{CurrentSlide.content.main}"</p>
+                                        <div className="inline-block bg-emerald-100 border-2 border-emerald-500 px-8 py-4 rounded-xl mt-4">
+                                            <p className="text-2xl text-emerald-900 font-bold">{CurrentSlide.content.concept}</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-6 mt-12">
+                                        {CurrentSlide.content.benefits.map((benefit, idx) => (
+                                            <div key={idx} className="bg-emerald-50 p-6 rounded-xl text-center">
+                                                <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <span className="text-white font-bold text-xl">{idx + 1}</span>
+                                                </div>
+                                                <p className="text-emerald-900 font-semibold">{benefit}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : currentSlide === 4 ? (
+                                // Solution
+                                <div className="h-[600px] p-12 overflow-y-auto">
+                                    <div className={`flex items-center mb-8 bg-gradient-to-r ${CurrentSlide.gradient} text-white p-6 rounded-2xl`}>
+                                        <CurrentSlide.icon className="w-12 h-12 mr-4" />
+                                        <h2 className="text-4xl font-bold">{CurrentSlide.title}</h2>
+                                    </div>
+                                    <div className="space-y-6">
+                                        {CurrentSlide.solutions.map((solution, idx) => (
+                                            <div key={idx} className="bg-amber-50 p-6 rounded-xl flex items-start">
+                                                <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                                                    <span className="text-white font-bold text-2xl">{idx + 1}</span>
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-2xl font-bold text-amber-900 mb-2">{solution.step}</h3>
+                                                    <p className="text-amber-700 text-lg">{solution.detail}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : currentSlide === 5 ? (
+                                // Marketing Strategy
+                                <div className="h-[600px] p-12 overflow-y-auto">
+                                    <div className={`flex items-center mb-8 bg-gradient-to-r ${CurrentSlide.gradient} text-white p-6 rounded-2xl`}>
+                                        <CurrentSlide.icon className="w-12 h-12 mr-4" />
+                                        <h2 className="text-4xl font-bold">{CurrentSlide.title}</h2>
+                                    </div>
+                                    <div className="space-y-6">
+                                        {CurrentSlide.channels.map((channel, idx) => (
+                                            <div key={idx} className="bg-purple-50 p-6 rounded-xl">
+                                                <h3 className="text-2xl font-bold text-purple-900 mb-3">{channel.type}</h3>
+                                                <p className="text-purple-700 text-lg">{channel.details}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : currentSlide === 6 ? (
+                                // Revenue Model
+                                <div className="h-[600px] p-12 overflow-y-auto">
+                                    <div className={`flex items-center mb-8 bg-gradient-to-r ${CurrentSlide.gradient} text-white p-6 rounded-2xl`}>
+                                        <CurrentSlide.icon className="w-12 h-12 mr-4" />
+                                        <h2 className="text-4xl font-bold">{CurrentSlide.title}</h2>
+                                    </div>
+                                    <div className="space-y-6">
+                                        {CurrentSlide.streams.map((stream, idx) => (
+                                            <div key={idx} className="bg-green-50 p-6 rounded-xl border-l-4 border-green-500">
+                                                <h3 className="text-2xl font-bold text-green-900 mb-3">{stream.source}</h3>
+                                                <p className="text-green-700 text-lg">{stream.model}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : currentSlide === 7 ? (
+                                // Financial Projections
+                                <div className="h-[600px] p-12 overflow-y-auto">
+                                    <div className={`flex items-center mb-8 bg-gradient-to-r ${CurrentSlide.gradient} text-white p-6 rounded-2xl`}>
+                                        <CurrentSlide.icon className="w-12 h-12 mr-4" />
+                                        <h2 className="text-4xl font-bold">{CurrentSlide.title}</h2>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-xl overflow-hidden">
+                                        <table className="w-full">
+                                            <thead>
+                                                <tr className="bg-gray-200">
+                                                    <th className="text-left p-4 text-gray-900 font-bold">Category</th>
+                                                    <th className="text-right p-4 text-gray-900 font-bold">Amount (BDT)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {CurrentSlide.budget.map((item, idx) => (
+                                                    <tr key={idx} className="border-t border-gray-200">
+                                                        <td className="p-4 text-gray-700">{item.category}</td>
+                                                        <td className="p-4 text-right text-gray-900 font-semibold">{parseInt(item.amount).toLocaleString()}</td>
+                                                    </tr>
+                                                ))}
+                                                <tr className="border-t-4 border-gray-900 bg-gray-900 text-white">
+                                                    <td className="p-4 font-bold text-lg">Total Investment</td>
+                                                    <td className="p-4 text-right font-bold text-lg">{parseInt(CurrentSlide.total).toLocaleString()}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ) : currentSlide === 8 ? (
+                                // Vision
+                                <div className="h-[600px] p-12 overflow-y-auto">
+                                    <div className={`flex items-center mb-8 bg-gradient-to-r ${CurrentSlide.gradient} text-white p-6 rounded-2xl`}>
+                                        <CurrentSlide.icon className="w-12 h-12 mr-4" />
+                                        <h2 className="text-4xl font-bold">{CurrentSlide.title}</h2>
+                                    </div>
+                                    <div className="bg-pink-50 p-8 rounded-xl mb-8">
+                                        <h3 className="text-xl font-bold text-pink-900 mb-4">The Challenge</h3>
+                                        <p className="text-pink-700 text-lg">{CurrentSlide.content.problem}</p>
+                                    </div>
+                                    <div className="bg-rose-50 p-8 rounded-xl">
+                                        <h3 className="text-xl font-bold text-rose-900 mb-4">{CurrentSlide.content.solution}</h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {CurrentSlide.content.benefits.map((benefit, idx) => (
+                                                <div key={idx} className="flex items-center bg-white p-4 rounded-lg shadow-sm">
+                                                    <div className="w-3 h-3 bg-rose-500 rounded-full mr-3"></div>
+                                                    <span className="text-rose-900 font-semibold">{benefit}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                // Unique Features
+                                
